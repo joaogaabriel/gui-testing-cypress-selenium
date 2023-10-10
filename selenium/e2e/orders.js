@@ -46,13 +46,79 @@ describe('orders', () => {
     assert(bodyText.includes('Shipping'));
   });
 
-  it('test case 2', async () => {
-    // Implement your test case 2 code here
-  });
 
-  it('test case 3', async () => {
-    // Implement your test case 3 code here
-  });
+ it('test case 2: Check Order Status', async () => {
+  await driver.findElement(By.linkText('Orders')).click();
+  await driver.findElement(By.id('criteria_orderStatus')).sendKeys('Completed');
+  await driver.findElement(By.css('*[class^="ui blue labeled icon button"]')).click();
+  
+  const orderStatusElements = await driver.findElements(By.css('.order-status'));
+  for (const element of orderStatusElements) {
+    const orderStatus = await element.getText();
+    assert.strictEqual(orderStatus, 'Completed');
+  }
+});
 
-  // Implement the remaining test cases in a similar manner
+it('test case 3: Add Product to Cart', async () => {
+  await driver.get('http://localhost:9990/shop'); // Go to the shop page
+  await driver.findElement(By.id('product_123_addToCart')).click(); // Replace 'product_123' with the actual product ID
+
+  const cartCountElement = await driver.findElement(By.id('cartItemCount'));
+  const cartCount = await cartCountElement.getText();
+  assert.strictEqual(cartCount, '1');
+});
+
+it('test case 4: Search for Products', async () => {
+  await driver.get('http://localhost:9990/shop'); // Go to the shop page
+  await driver.findElement(By.id('searchInput')).sendKeys('example product'); // Enter the search query
+  await driver.findElement(By.id('searchButton')).click();
+
+  const searchResults = await driver.findElements(By.className('product-list-item'));
+  assert(searchResults.length > 0, 'No search results found.');
+});
+
+it('test case 5: Update User Profile', async () => {
+  await driver.get('http://localhost:9990/profile'); // Go to the user profile page
+  await driver.findElement(By.id('editProfileButton')).click();
+  await driver.findElement(By.id('fullName')).sendKeys('John Doe'); // Replace with user details
+  await driver.findElement(By.id('saveProfileButton')).click();
+
+  const successMessage = await driver.findElement(By.id('profileUpdatedMessage')).getText();
+  assert.strictEqual(successMessage, 'Profile updated successfully.');
+});
+
+it('test case 6: Check Product Availability', async () => {
+  await driver.get('http://localhost:9990/shop'); // Go to the shop page
+  const availability = await driver.findElement(By.className('product-availability')).getText();
+  assert(availability.includes('In Stock') || availability.includes('Available'), 'Product is not available.');
+});
+
+it('test case 7: Empty Cart', async () => {
+  await driver.get('http://localhost:9990/cart'); // Go to the cart page
+  await driver.findElement(By.id('emptyCartButton')).click();
+  const emptyCartMessage = await driver.findElement(By.id('emptyCartMessage')).getText();
+  assert.strictEqual(emptyCartMessage, 'Your cart is empty.');
+});
+
+it('test case 8: Check Terms and Conditions', async () => {
+  await driver.get('http://localhost:9990/terms'); // Go to the terms and conditions page
+  const termsText = await driver.findElement(By.id('termsText')).getText();
+  assert(termsText.includes('Terms and Conditions'), 'Terms and Conditions not found.');
+});
+
+it('test case 9: Add Address to User Profile', async () => {
+  await driver.get('http://localhost:9990/profile'); // Go to the user profile page
+  await driver.findElement(By.id('editAddressButton')).click();
+  await driver.findElement(By.id('addressLine1')).sendKeys('123 Main St'); // Replace with user address details
+  await driver.findElement(By.id('saveAddressButton')).click();
+  const addressMessage = await driver.findElement(By.id('addressSavedMessage')).getText();
+  assert.strictEqual(addressMessage, 'Address saved successfully.');
+});
+
+it('test case 10: Check Product Description', async () => {
+  await driver.get('http://localhost:9990/product/123'); // Replace '123' with the actual product ID
+  const productDescription = await driver.findElement(By.id('productDescription')).getText();
+  assert(productDescription.includes('Product Description'), 'Product description not found.');
+});
+
 });
